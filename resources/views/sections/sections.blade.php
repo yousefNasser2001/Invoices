@@ -24,6 +24,8 @@
     <!-- breadcrumb -->
 @endsection
 @section('content')
+    @include('flash::message')
+
     <!-- row -->
     <div class="row">
 
@@ -34,7 +36,6 @@
                     <div class="d-flex justify-content-between">
                         <a class="modal-effect btn btn-outline-primary btn-block" data-effect="effect-scale"
                             data-toggle="modal" href="#modaldemo8">اضافة قسم</a>
-                        <i class="mdi mdi-dots-horizontal text-gray"></i>
                     </div>
                 </div>
                 <div class="card-body">
@@ -49,12 +50,16 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>$320,800</td>
-                                    <td>$320,800</td>
-                                    <td>$320,800</td>
-                                    <td>$320,800</td>
-                                </tr>
+                                <?php $i = 0 ?>
+                                @foreach ($sections as $section)
+                                    <?php $i++ ?>
+                                    <tr>
+                                        <td>{{$i}}</td>
+                                        <td>{{$section->section_name}}</td>
+                                        <td>{{$section->description}}</td>
+                                        <td>{{$section->description}}</td>
+                                    </tr>
+                                @endforeach
 
                             </tbody>
                         </table>
