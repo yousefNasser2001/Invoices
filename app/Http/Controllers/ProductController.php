@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
 use App\Models\Section;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
-class SectionController extends Controller
+class ProductController extends Controller
 {
 
     public function index()
     {
-        $sections = Section::orderByDesc('id')->get();
-        return view('sections.sections', compact('sections'));
+        $products = Product::orderByDesc('id')->get();
+        $sections = Section::pluck('id', 'section_name');
+        return view('products.products', compact('sections', 'products'));
     }
 
     public function create()
@@ -26,41 +27,35 @@ class SectionController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'section_name' => 'required|unique:sections|max:255',
+            'product_name' => 'required',
+            'section_id' => 'required|exists:sections,id',
             'description' => 'nullable',
         ]);
-
-        // هاد طريقة ترجمة رسائل الخطا دون استخدام دوال الترجمة
-        // ] , [
-        //     'section_name.required' => 'يرجى ادخال اسم القسم',
-        //     'section_name.unique' => 'اسم القسم موجود مسبقا',
-        //     'description.required' => 'يرجى ادخال الوصف',
-        // ]);
 
         if ($validator->fails()) {
             return $this->error($validator->errors()->first());
         }
 
         try {
-            Section::create([
-                'section_name' => $request->section_name,
+            Product::create([
+                'product_name' => $request->product_name,
+                'section_id' => $request->section_id,
                 'description' => $request->description,
-                'created_by' => (Auth::user()->name),
-
             ]);
-            flash('تم اضافة القسم بنجاح')->success();
-            return redirect()->route('sections.index');
+            flash('تم اضافة المنتج بنجاح')->success();
+            return back();
         } catch (Exception $e) {
             return $this->error();
         }
+
     }
 
-    public function show(Section $section)
+    public function show(Product $product)
     {
         return back();
     }
 
-    public function edit(Section $section)
+    public function edit(Product $product)
     {
         return back();
     }
@@ -68,7 +63,8 @@ class SectionController extends Controller
     public function update(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'section_name' => 'required|max:255|unique:sections,section_name,' . $id,
+            'product_name' => 'required',
+            'section_name' => 'required|exists:sections,section_name',
             'description' => 'nullable',
         ]);
 
@@ -77,30 +73,33 @@ class SectionController extends Controller
         }
 
         try {
-            $section = Section::find($request->id);
-            $section->update([
-                'section_name' => $request->section_name,
-                'description' => $request->description,
-            ]);
-            flash('تم تحديث القسم بنجاح')->success();
 
+            $product = Product::findOrFail($request->pro_id);
+            $section_id = Section::where('section_name', $request->section_name)->first()->id;
+
+            $product->update([
+                'product_name' => $request->product_name,
+                'description' => $request->description,
+                'section_id' => $section_id,
+            ]);
+            flash('تم تحديث المنتج بنجاح')->success();
             return back();
         } catch (Exception $e) {
             return $this->error();
         }
+
     }
 
     public function destroy(Request $request)
     {
         try {
-            $section = Section::find($request->id);
-            $section->delete();
-            flash('تم حذف القسم بنجاح')->success();
+            $product = Product::find($request->pro_id);
+            $product->delete();
+            flash('تم حذف المنتج بنجاح')->success();
             return back();
         } catch (Exception) {
             return $this->error();
         }
-
     }
 
     public function error($message = null): RedirectResponse
