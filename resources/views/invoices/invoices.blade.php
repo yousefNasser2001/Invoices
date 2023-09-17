@@ -1,7 +1,7 @@
 @extends('layouts.master')
 
 @section('title')
-لوحة التحكم - الفواتير
+    لوحة التحكم - الفواتير
 @endsection
 
 
@@ -28,62 +28,129 @@
     <!-- breadcrumb -->
 @endsection
 @section('content')
+    @include('flash::message')
     <!-- row -->
     <div class="row">
 
-            <!--div-->
-            <div class="col-xl-12">
-                <div class="card mg-b-20">
-                    <div class="card-header pb-0">
-                        <div class="d-flex justify-content-between">
-                            <h4 class="card-title mg-b-0">Bordered Table</h4>
-                            <i class="mdi mdi-dots-horizontal text-gray"></i>
-                        </div>
-                        <p class="tx-12 tx-gray-500 mb-2">Example of Valex Bordered Table.. <a href="">Learn more</a>
-                        </p>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table id="example1" class="table key-buttons text-md-nowrap">
-                                <thead>
-                                    <tr>
-                                        <th class="border-bottom-0">#</th>
-                                        <th class="border-bottom-0">رقم الفاتورة</th>
-                                        <th class="border-bottom-0">تاريخ الفاتورة</th>
-                                        <th class="border-bottom-0">تاريخ الاستحقاق</th>
-                                        <th class="border-bottom-0">المنتج</th>
-                                        <th class="border-bottom-0">القسم</th>
-                                        <th class="border-bottom-0">الخصم</th>
-                                        <th class="border-bottom-0">نسبة الضريبة</th>
-                                        <th class="border-bottom-0">قيمة الضريبة</th>
-                                        <th class="border-bottom-0">الاجمالي</th>
-                                        <th class="border-bottom-0">الحالة</th>
-                                        <th class="border-bottom-0">ملاحظات</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>Tiger Nixon</td>
-                                        <td>System Architect</td>
-                                        <td>Edinburgh</td>
-                                        <td>61</td>
-                                        <td>2011/04/25</td>
-                                        <td>$320,800</td>
-                                        <td>$320,800</td>
-                                        <td>$320,800</td>
-                                        <td>$320,800</td>
-                                        <td>$320,800</td>
-                                        <td>$320,800</td>
-                                        <td>$320,800</td>
-                                    </tr>
+        <!--div-->
+        <div class="col-xl-12">
+            <div class="card mg-b-20">
+                <div class="card-header pb-0">
+                    <a href="{{ route('invoices.create') }}" class="modal-effect btn btn-sm btn-primary"
+                        style="color:white"><i class="fas fa-plus"></i>&nbsp; اضافة فاتورة</a>
 
-                                </tbody>
-                            </table>
-                        </div>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="example1" class="table key-buttons text-md-nowrap">
+                            <thead>
+                                <tr>
+                                    <th class="border-bottom-0">#</th>
+                                    <th class="border-bottom-0">رقم الفاتورة</th>
+                                    <th class="border-bottom-0">تاريخ الفاتورة</th>
+                                    <th class="border-bottom-0">تاريخ الاستحقاق</th>
+                                    <th class="border-bottom-0">المنتج</th>
+                                    <th class="border-bottom-0">القسم</th>
+                                    <th class="border-bottom-0">الخصم</th>
+                                    <th class="border-bottom-0">نسبة الضريبة</th>
+                                    <th class="border-bottom-0">قيمة الضريبة</th>
+                                    <th class="border-bottom-0">الاجمالي</th>
+                                    <th class="border-bottom-0">الحالة</th>
+                                    <th class="border-bottom-0">ملاحظات</th>
+                                    <th class="border-bottom-0">العمليات</th>
+
+                                </tr>
+
+                            </thead>
+                            <tbody>
+                                <?php $i = 0; ?>
+                                @foreach ($invoices as $invoice)
+                                    <?php $i++; ?>
+                                    <tr>
+                                        <td class="border-bottom-0">{{ $i }}</td>
+                                        <td><a
+                                                href="{{ route('invoice_details.edit', $invoice->id) }}">{{ $invoice->invoice_number }}</a>
+                                        </td>
+
+                                        <td class="border-bottom-0">{{ $invoice->invoice_date }}</td>
+                                        <td class="border-bottom-0">{{ $invoice->due_date }}</td>
+                                        <td class="border-bottom-0">{{ $invoice->product }}</td>
+                                        <td class="border-bottom-0">{{ $invoice->section->section_name }}</td>
+                                        <td class="border-bottom-0">{{ $invoice->discount }}</td>
+                                        <td class="border-bottom-0">{{ $invoice->rate_vat }}</td>
+                                        <td class="border-bottom-0">{{ $invoice->value_vat }}</td>
+                                        <td class="border-bottom-0">{{ $invoice->total }}</td>
+                                        <td>
+                                            @if ($invoice->value_status == 1)
+                                                <span class="badge badge-pill badge-success">{{ $invoice->status }}</span>
+                                            @elseif($invoice->value_status == 0)
+                                                <span class="badge badge-pill badge-danger">{{ $invoice->status }}</span>
+                                            @else
+                                                <span class="badge badge-pill badge-warning">{{ $invoice->status }}</span>
+                                            @endif
+
+                                        </td>
+                                        <td class="border-bottom-0">{{ $invoice->note }}</td>
+                                        <td>
+                                            <div class="dropdown">
+                                                <button aria-expanded="false" aria-haspopup="true"
+                                                    class="btn ripple btn-primary btn-sm" data-toggle="dropdown"
+                                                    type="button">العمليات<i class="fas fa-caret-down ml-1"></i></button>
+                                                <div class="dropdown-menu tx-13">
+                                                    <a class="dropdown-item"
+                                                        href=" {{ route('invoices.edit', $invoice->id) }}">تعديل
+                                                        الفاتورة</a>
+
+                                                    <a class="dropdown-item" href="#"
+                                                        data-invoice_id="{{ $invoice->id }}" data-toggle="modal"
+                                                        data-target="#delete_invoice"><i
+                                                            class="text-danger fas fa-trash-alt"></i>&nbsp;&nbsp;حذف
+                                                        الفاتورة</a>
+
+                                                </div>
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <!--/div-->
+        </div>
+        <!--/div-->
+
+
+        <!-- حذف الفاتورة -->
+        <div class="modal fade" id="delete_invoice" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">حذف الفاتورة</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                        <form action="{{ route('invoices.destroy', 'test') }}" method="post">
+                            @method('DELETE')
+                            @csrf
+                    </div>
+                    <div class="modal-body">
+                        هل انت متاكد من عملية الحذف ؟
+                        <input type="hidden" name="invoice_id" id="invoice_id" value="">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">الغاء</button>
+                        <button type="submit" class="btn btn-danger">تاكيد</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
 
 
     </div>
@@ -113,4 +180,13 @@
     <script src="{{ URL::asset('assets/plugins/datatable/js/responsive.bootstrap4.min.js') }}"></script>
     <!--Internal  Datatable js -->
     <script src="{{ URL::asset('assets/js/table-data.js') }}"></script>
+
+    <script>
+        $('#delete_invoice').on('show.bs.modal', function(event) {
+            var button = $(event.relatedTarget)
+            var invoice_id = button.data('invoice_id')
+            var modal = $(this)
+            modal.find('.modal-body #invoice_id').val(invoice_id);
+        })
+    </script>
 @endsection

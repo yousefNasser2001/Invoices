@@ -67,6 +67,7 @@ class SectionController extends Controller
 
     public function update(Request $request)
     {
+        $id = $request->id();
         $validator = Validator::make($request->all(), [
             'section_name' => 'required|max:255|unique:sections,section_name,' . $id,
             'description' => 'nullable',
@@ -77,7 +78,7 @@ class SectionController extends Controller
         }
 
         try {
-            $section = Section::find($request->id);
+            $section = Section::find($id);
             $section->update([
                 'section_name' => $request->section_name,
                 'description' => $request->description,
