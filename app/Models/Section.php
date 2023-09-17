@@ -9,10 +9,15 @@ class Section extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['section_name' , 'description' , 'created_by'];
+    protected $fillable = ['section_name', 'description', 'created_by'];
 
     public function products()
     {
-        return $this->hasMany(Product::class ,'section_id');
+        return $this->hasMany(Product::class, 'section_id');
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class, 'section_id');
     }
 }
