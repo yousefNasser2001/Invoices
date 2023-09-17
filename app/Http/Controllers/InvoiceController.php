@@ -224,7 +224,7 @@ class InvoiceController extends Controller
         return json_encode($products);
     }
 
-    public function verifiedPayment($id):JsonResponse
+    public function verifiedPayment($id): JsonResponse
     {
         try {
             $invoice = Invoice::find($id);
@@ -237,8 +237,20 @@ class InvoiceController extends Controller
                 } else {
                     $invoice->update([
                         'value_status' => 1,
-                        'status' => 'مدفوعة'
+                        'status' => 'مدفوعة',
                     ]);
+                    InvoicesDetails::create([
+                        'invoice_id' => $invoice->id,
+                        'invoice_number' => $invoice->invoice_number,
+                        'product' => $invoice->product,
+                        'section' => $invoice->section,
+                        'status' => 'مدفوعة',
+                        'value_status' => 1,
+                        'note' => $invoice->note,
+                        'payment_date' => now(),
+                        'user' => (Auth::user()->name),
+                    ]);
+
                     return Response()->json([
                         'status' => 'success',
                         'message' => 'تمت عملية السداد بنجاح',
