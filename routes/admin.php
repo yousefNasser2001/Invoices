@@ -31,6 +31,8 @@ Route::prefix('dashboard/admin/')->group(static function () {
         Route::get('/invoice_details/{invoiceNumber}/view-file/{attachmentId}', [InvoicesDetailsController::class, 'view_file'])->name('invoice_details.view-file');
         Route::get('/invoice_details/{invoiceNumber}/download-file/{file_name}', [InvoicesDetailsController::class, 'download_file'])->name('invoice_details.download-file');
         Route::post('delete_file', [InvoicesDetailsController::class, 'destroy'])->name('invoice_details.delete_file');
+        Route::post('/verifiedPayment/{id}', [InvoiceController::class, 'verifiedPayment'])->name('invoices.verifiedPayment');
+
         Route::resource('attachments', InvoicesAttachmentsController::class);
     });
 });

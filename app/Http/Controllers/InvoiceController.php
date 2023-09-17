@@ -7,6 +7,7 @@ use App\Models\InvoicesAttachments;
 use App\Models\InvoicesDetails;
 use App\Models\Section;
 use Exception;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -136,7 +137,7 @@ class InvoiceController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request , $id)
+    public function update(Request $request, $id)
     {
 
         $validator = Validator::make($request->all(), [
@@ -186,17 +187,34 @@ class InvoiceController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Request $request)
+    public function destroy($id)
     {
 
         try {
-            $invoice = Invoice::find($request->invoice_id);
+            $invoice = Invoice::findOrFail($id);
             $invoice->delete();
-            flash('تم حذف الفاتورة بنجاح')->success();
-            return back();
+
+            if ($invoice) {
+                return response()->json([
+                    'status' => 'success',
+                    'message' => translate('messages.Deleted'),
+                ]);
+            }
         } catch (Exception) {
-            return $this->error();
+            return response()->json([
+                'status' => 'error',
+                'message' => translate('messages.Wrong'),
+            ]);
         }
+
+        // try {
+        //     $invoice = Invoice::find($request->invoice_id);
+        //     $invoice->delete();
+        //     flash('تم حذف الفاتورة بنجاح')->success();
+        //     return back();
+        // } catch (Exception) {
+        //     return $this->error();
+        // }
 
     }
 
@@ -204,6 +222,41 @@ class InvoiceController extends Controller
     {
         $products = DB::table('products')->where('section_id', $id)->pluck('product_name', 'id');
         return json_encode($products);
+    }
+
+    public function verifiedPayment($id):JsonResponse
+    {
+        try {
+            $invoice = Invoice::find($id);
+            if ($invoice) {
+                if ($invoice->value_status == 1) {
+                    return Response()->json([
+                        'status' => 'error',
+                        'message' => 'لا يمكن دفع الديون المدفوعة',
+                    ]);
+                } else {
+                    $invoice->update([
+                        'value_status' => 1,
+                        'status' => 'مدفوعة'
+                    ]);
+                    return Response()->json([
+                        'status' => 'success',
+                        'message' => 'تمت عملية السداد بنجاح',
+                    ]);
+                }
+            }
+
+            return Response()->json([
+                'status' => 'error',
+                'message' => 'Not Found',
+            ], 404);
+
+        } catch (Exception $e) {
+            return Response()->json([
+                'status' => 'error',
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 
     public function error($message = null): RedirectResponse

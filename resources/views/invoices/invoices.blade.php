@@ -42,7 +42,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="example1" class="table key-buttons text-md-nowrap">
+                        <table id="invoices-table" class="table key-buttons text-md-nowrap">
                             <thead>
                                 <tr>
                                     <th class="border-bottom-0">#</th>
@@ -80,7 +80,7 @@
                                         <td class="border-bottom-0">{{ $invoice->rate_vat }}</td>
                                         <td class="border-bottom-0">{{ $invoice->value_vat }}</td>
                                         <td class="border-bottom-0">{{ $invoice->total }}</td>
-                                        <td>
+                                        <td data-status="paidStatus">
                                             @if ($invoice->value_status == 1)
                                                 <span class="badge badge-pill badge-success">{{ $invoice->status }}</span>
                                             @elseif($invoice->value_status == 0)
@@ -101,11 +101,28 @@
                                                         href=" {{ route('invoices.edit', $invoice->id) }}">تعديل
                                                         الفاتورة</a>
 
-                                                    <a class="dropdown-item" href="#"
-                                                        data-invoice_id="{{ $invoice->id }}" data-toggle="modal"
-                                                        data-target="#delete_invoice"><i
-                                                            class="text-danger fas fa-trash-alt"></i>&nbsp;&nbsp;حذف
-                                                        الفاتورة</a>
+
+
+                                                    <form action="{{ route('invoices.verifiedPayment', $invoice->id) }}"
+                                                        method="post"
+                                                        data-kt-subscription-table-filter="verifiedSubscriptionPayment_form">
+                                                        @csrf
+                                                        <a class="dropdown-item"
+                                                            data-kt-Subscription-table-filter="verfiedSubscriptionPaynment_row"
+                                                            href="#"><i
+                                                                class=" text-success fas fa-money-bill"></i>&nbsp;&nbsp;ادفع</a>
+                                                    </form>
+
+                                                    <form action="{{ route('invoices.destroy', $invoice->id) }}"
+                                                        method="post" data-kt-debts-table-filter="delete_form">
+                                                        <a class="dropdown-item" href=""
+                                                            data-kt-debts-table-filter="delete_row"><i
+                                                                class=" text-danger fas fa-trash-alt"></i>&nbsp;&nbsp;حذف
+                                                            الفاتورة</a>
+                                                    </form>
+
+
+
 
                                                 </div>
                                             </div>
@@ -188,5 +205,168 @@
             var modal = $(this)
             modal.find('.modal-body #invoice_id').val(invoice_id);
         })
+    </script>
+
+    <script>
+        toastr.options = {
+            positionClass: 'toast-bottom-left', // Set the position to left-bottom
+        };
+
+        function handlePayment(parent) {
+            let paynmentStatusTd = parent.querySelector('[data-status="paidStatus"]');
+            const verfiedForm = parent.querySelector(
+                '[data-kt-subscription-table-filter="verifiedSubscriptionPayment_form"]');
+
+            Swal.fire({
+                text: "هل أنت متأكد من أنك تريد الدفع ؟",
+                icon: "warning",
+                showCancelButton: true,
+                buttonsStyling: false,
+                confirmButtonText: "نعم ، ادفع المبلغ!",
+                cancelButtonText: "لا ، ارجع",
+                customClass: {
+                    confirmButton: "btn fw-bold btn-danger",
+                    cancelButton: "btn fw-bold btn-active-light-primary"
+                }
+            }).then(function(result) {
+                if (result.value) {
+                    if (paynmentStatusTd.innerText === 'مدفوعة') {
+                        Swal.fire({
+                            text: "لا يمكن دفع الفواتير المدفوعة",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "حسنا، اذهب",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
+                    } else {
+                        let Url = verfiedForm.action;
+                        let method = verfiedForm.method;
+                        let csrfToken = $('meta[name="csrf-token"]').attr('content');
+                        $.ajax({
+                            url: Url,
+                            type: method,
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            success: function(response) {
+                                if (response.status == 'success') {
+                                    toastr.success(response.message);
+                                    let paynmentStatusSpan = paynmentStatusTd.getElementsByTagName(
+                                        'span')[0];
+                                    paynmentStatusSpan.innerText = 'مدفوعة';
+                                    paynmentStatusSpan.classList.add('badge-success');
+                                    paynmentStatusSpan.classList.remove('badge-danger');
+                                } else if (response.status == 'warning') {
+                                    toastr.warning(response.message);
+                                } else if (response.status == 'error') {
+                                    toastr.error(response.message);
+                                }
+                            },
+                            error: function(xhr, status, error) {
+                                console.log("XHR status:", xhr.status);
+                                console.log("XHR statusText:", xhr.statusText);
+                                console.log("Error:", error);
+                            }
+                        })
+                    }
+                }
+            });
+        }
+
+        const payButtons = document.querySelectorAll(
+            '[data-kt-Subscription-table-filter="verfiedSubscriptionPaynment_row"]');
+        payButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();
+                const parent = e.target.closest('tr');
+                handlePayment(parent);
+            });
+        });
+    </script>
+
+    <script>
+        let table = document.getElementById('invoices-table');
+        // Select all delete buttons
+
+        dataTable = $(table).DataTable({
+            language: {
+                searchPlaceholder: 'Search...',
+                sSearch: '',
+                lengthMenu: '_MENU_',
+            }
+        });
+        const deleteButtons = table.querySelectorAll('[data-kt-debts-table-filter="delete_row"]');
+
+        deleteButtons.forEach(d => {
+            // Delete button on click
+            d.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Select parent row
+                const parent = e.target.closest('tr');
+                const invoiceName = parent.querySelectorAll('td')[1].innerText;
+                // Select all delete form
+                const deletForm = parent.querySelector(
+                    '[data-kt-debts-table-filter="delete_form"]');
+
+                Swal.fire({
+                    text: "هل أنت متأكد من أنك تريد حذف  " + invoiceName + "؟",
+                    icon: "warning",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "نعم ، احذف!",
+                    cancelButtonText: "لا ، ارجع",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-danger",
+                        cancelButton: "btn fw-bold btn-active-light-primary"
+                    }
+                }).then(function(result) {
+                    if (result.value) {
+                        // Remove current row
+                        let Url = deletForm.action;
+                        let method = deletForm.method;
+                        let csrfToken = $('meta[name="csrf-token"]').attr('content');
+                        $.ajax({
+                            url: Url,
+                            type: method,
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            data: {
+                                '_method': 'delete'
+                            },
+                            success: function(response) {
+                                if (response.status == 'success') {
+                                    toastr.success(response.message);
+                                    dataTable.row($(parent)).remove().draw();
+                                } else if (response.status == 'warning') {
+                                    toastr.warning(response.message);
+                                } else if (response.status == 'error') {
+                                    toastr.error(response.message);
+                                }
+                                console.log(response.message)
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(error);
+                            }
+                        }).then(function() {
+                            // Detect checked checkboxes
+                            toggleToolbars();
+                        });
+                    } else if (result.dismiss === 'cancel') {
+                        Swal.fire({
+                            text: invoiceName + " لم يتم حذفها .",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "حسنا ، اذهب!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
+                    }
+                });
+            })
+        });
     </script>
 @endsection
