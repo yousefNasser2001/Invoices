@@ -7,7 +7,6 @@ use App\Models\InvoicesAttachments;
 use App\Models\InvoicesDetails;
 use App\Models\Section;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -116,12 +115,10 @@ class InvoiceController extends Controller
 
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Invoice $invoice)
+    public function show($id)
     {
-        //
+        $invoice = Invoice::where('id', $id)->first();
+        return view('invoices.update_status', compact('invoice'));
     }
 
     /**
@@ -224,51 +221,49 @@ class InvoiceController extends Controller
         return json_encode($products);
     }
 
-    public function verifiedPayment($id): JsonResponse
+    public function update_status($id , Request $request)
     {
-        try {
-            $invoice = Invoice::find($id);
-            if ($invoice) {
-                if ($invoice->value_status == 1) {
-                    return Response()->json([
-                        'status' => 'error',
-                        'message' => 'لا يمكن دفع الديون المدفوعة',
-                    ]);
-                } else {
-                    $invoice->update([
-                        'value_status' => 1,
-                        'status' => 'مدفوعة',
-                    ]);
-                    InvoicesDetails::create([
-                        'invoice_id' => $invoice->id,
-                        'invoice_number' => $invoice->invoice_number,
-                        'product' => $invoice->product,
-                        'section' => $invoice->section,
-                        'status' => 'مدفوعة',
-                        'value_status' => 1,
-                        'note' => $invoice->note,
-                        'payment_date' => now(),
-                        'user' => (Auth::user()->name),
-                    ]);
+        $invoices = Invoice::findOrFail($id);
 
-                    return Response()->json([
-                        'status' => 'success',
-                        'message' => 'تمت عملية السداد بنجاح',
-                    ]);
-                }
-            }
+        if ($request->status === 'مدفوعة') {
 
-            return Response()->json([
-                'status' => 'error',
-                'message' => 'Not Found',
-            ], 404);
+            $invoices->update([
+                'value_status' => 1,
+                'status' => $request->status,
+                'payment_date' => $request->payment_date,
+            ]);
 
-        } catch (Exception $e) {
-            return Response()->json([
-                'status' => 'error',
-                'message' => $e->getMessage(),
+            InvoicesDetails::create([
+                'invoice_id' => $request->invoice_id,
+                'invoice_number' => $request->invoice_number,
+                'product' => $request->product,
+                'section' => $request->section,
+                'status' => $request->status,
+                'value_status' => 1,
+                'note' => $request->note,
+                'payment_date' => $request->payment_date,
+                'user' => (Auth::user()->name),
+            ]);
+        } else {
+            $invoices->update([
+                'value_status' => 2,
+                'status' => $request->status,
+                'payment_date' => $request->payment_date,
+            ]);
+            InvoicesDetails::create([
+                'invoice_id' => $request->invoice_id,
+                'invoice_number' => $request->invoice_number,
+                'product' => $request->product,
+                'section' => $request->section,
+                'status' => $request->status,
+                'value_status' => 2,
+                'note' => $request->note,
+                'payment_date' => $request->payment_date,
+                'user' => (Auth::user()->name),
             ]);
         }
+        flash('تم تحديث حالة الفاتورة بنجاح')->success();
+        return redirect()->route('invoices.index');
     }
 
     public function error($message = null): RedirectResponse

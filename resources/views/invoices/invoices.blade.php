@@ -103,15 +103,11 @@
 
 
 
-                                                    <form action="{{ route('invoices.verifiedPayment', $invoice->id) }}"
-                                                        method="post"
-                                                        data-kt-subscription-table-filter="verifiedSubscriptionPayment_form">
-                                                        @csrf
-                                                        <a class="dropdown-item"
-                                                            data-kt-Subscription-table-filter="verfiedSubscriptionPaynment_row"
-                                                            href="#"><i
-                                                                class=" text-success fas fa-money-bill"></i>&nbsp;&nbsp;ادفع</a>
-                                                    </form>
+                                                    <a class="dropdown-item" href="{{ route('status.show' , $invoice->id) }}"><i
+                                                            class=" text-success fas fa-money-bill"></i>&nbsp;&nbsp;تغيير
+                                                        حالة الدفع
+                                                    </a>
+
 
                                                     <form action="{{ route('invoices.destroy', $invoice->id) }}"
                                                         method="post" data-kt-debts-table-filter="delete_form">
