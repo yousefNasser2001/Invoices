@@ -39,6 +39,11 @@
                     <a href="{{ route('invoices.create') }}" class="modal-effect btn btn-sm btn-primary"
                         style="color:white"><i class="fas fa-plus"></i>&nbsp; اضافة فاتورة</a>
 
+
+                    <a class="modal-effect btn btn-sm btn-primary" href="{{route('export_invoice')}}"
+                        style="color:white"><i class="fas fa-file-download"></i>&nbsp;تصدير اكسيل</a>
+
+
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -125,7 +130,8 @@
                                                         الارشيف</a>
 
 
-                                                    <a class="dropdown-item" href="{{route('print_invoice' , $invoice->id)}}"><i
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('print_invoice', $invoice->id) }}"><i
                                                             class="text-success fas fa-print"></i>&nbsp;&nbsp;طباعة
                                                         الفاتورة
                                                     </a>
