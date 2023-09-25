@@ -6,11 +6,15 @@ use App\Models\Invoice;
 use App\Models\InvoicesAttachments;
 use App\Models\InvoicesDetails;
 use App\Models\Section;
+use App\Models\User;
+use App\Notifications\AddInvoice;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class InvoiceController extends Controller
@@ -56,6 +60,8 @@ class InvoiceController extends Controller
         if ($validator->fails()) {
             return $this->error($validator->errors()->first());
         }
+
+        DB::beginTransaction();
 
         try {
             Invoice::create([
@@ -107,9 +113,14 @@ class InvoiceController extends Controller
                 $request->pic->move(public_path('Attachments/' . $invoice_number), $imageName);
             }
 
+            $user = User::first();
+            Notification::send($user, new AddInvoice($invoice_id));
+
             flash('تم اضافة الفاتورة بنجاح')->success();
+            DB::commit();
             return back();
         } catch (Exception $e) {
+            DB::rollback();
             return $this->error();
         }
 
@@ -186,11 +197,15 @@ class InvoiceController extends Controller
      */
     public function destroy($id)
     {
-
         try {
             $invoice = Invoice::findOrFail($id);
-            $invoice->delete();
+            $Details = InvoicesAttachments::findOrFail($id);
 
+            if (!empty($Details->invoice_number)) {
+                Storage::disk('public_uploads')->deleteDirectory($Details->invoice_number);
+            }
+
+            $invoice->forceDelete();
             if ($invoice) {
                 return response()->json([
                     'status' => 'success',
@@ -203,16 +218,15 @@ class InvoiceController extends Controller
                 'message' => translate('messages.Wrong'),
             ]);
         }
+    }
 
-        // try {
-        //     $invoice = Invoice::find($request->invoice_id);
-        //     $invoice->delete();
-        //     flash('تم حذف الفاتورة بنجاح')->success();
-        //     return back();
-        // } catch (Exception) {
-        //     return $this->error();
-        // }
-
+    public function archive_invoice(Request $request)
+    {
+        $id = $request->invoice_id;
+        $invoices = Invoice::findOrFail($id);
+        $invoices->delete();
+        flash('تم ارشفة الفاتورة بنجاح')->success();
+        return redirect()->route('archive.index');
     }
 
     public function getProducts($id)
@@ -221,7 +235,7 @@ class InvoiceController extends Controller
         return json_encode($products);
     }
 
-    public function update_status($id , Request $request)
+    public function update_status($id, Request $request)
     {
         $invoices = Invoice::findOrFail($id);
 
@@ -264,6 +278,31 @@ class InvoiceController extends Controller
         }
         flash('تم تحديث حالة الفاتورة بنجاح')->success();
         return redirect()->route('invoices.index');
+    }
+
+    public function paid_invoices()
+    {
+        $invoices = Invoice::where('value_status', 1)->get();
+        return view('invoices.paid_invoices', compact('invoices'));
+    }
+
+    public function unpaid_invoices()
+    {
+        $invoices = Invoice::where('value_status', 0)->get();
+        return view('invoices.unpaid_invoices', compact('invoices'));
+    }
+
+    public function partial_paid_invoices()
+    {
+        $invoices = Invoice::where('value_status', 2)->get();
+        return view('invoices.partial_paid_invoices', compact('invoices'));
+    }
+
+    public function print_invoice($id)
+    {
+        $invoice = Invoice::where('id', $id)->first();
+        return view('invoices.print_invoice', compact('invoice'));
+
     }
 
     public function error($message = null): RedirectResponse
