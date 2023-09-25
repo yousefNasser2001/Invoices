@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ArchiveInvoiceController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoicesAttachmentsController;
 use App\Http\Controllers\InvoicesDetailsController;
@@ -33,8 +34,18 @@ Route::prefix('dashboard/admin/')->group(static function () {
         Route::post('delete_file', [InvoicesDetailsController::class, 'destroy'])->name('invoice_details.delete_file');
         Route::get('/show_status/{id}', [InvoiceController::class, 'show'])->name('status.show');
 
-        Route::post('/update_satus/{id}', [InvoiceController::class , 'update_status'])->name('status.update');
+        Route::post('/update_satus/{id}', [InvoiceController::class, 'update_status'])->name('status.update');
 
         Route::resource('attachments', InvoicesAttachmentsController::class);
+
+        Route::get('paid_invoices', [InvoiceController::class, 'paid_invoices'])->name('paid_invoices');
+        Route::get('unpaid_invoices', [InvoiceController::class, 'unpaid_invoices'])->name('unpaid_invoices');
+        Route::get('partial_paid_invoices', [InvoiceController::class, 'partial_paid_invoices'])->name('partial_paid_invoices');
+        Route::delete('archive_invoice', [InvoiceController::class, 'archive_invoice'])->name('invoices.archive');
+
+        Route::resource('archive', ArchiveInvoiceController::class);
+
+        Route::get('print_invoice/{id}', [InvoiceController::class, 'print_invoice'])->name('print_invoice');
+
     });
 });
