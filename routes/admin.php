@@ -47,5 +47,8 @@ Route::prefix('dashboard/admin/')->group(static function () {
 
         Route::get('print_invoice/{id}', [InvoiceController::class, 'print_invoice'])->name('print_invoice');
 
+        Route::get('invoices_export', [InvoiceController::class, 'export'])->name('export_invoice');
+
+
     });
 });
