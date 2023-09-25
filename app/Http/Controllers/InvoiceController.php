@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\InvoicesExport;
 use App\Models\Invoice;
 use App\Models\InvoicesAttachments;
 use App\Models\InvoicesDetails;
@@ -16,30 +17,25 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Maatwebsite\Excel\Facades\Excel;
 
 class InvoiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+
     public function index()
     {
         $invoices = Invoice::orderByDesc('id')->get();
         return view('invoices.invoices', compact('invoices'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+
     public function create()
     {
         $sections = Section::pluck('id', 'section_name');
         return view('invoices.add_invoices', compact('sections'));
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -132,9 +128,7 @@ class InvoiceController extends Controller
         return view('invoices.update_status', compact('invoice'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
+
     public function edit($id)
     {
         $invoice = Invoice::where('id', $id)->first();
@@ -142,9 +136,7 @@ class InvoiceController extends Controller
         return view('invoices.edit_invoice', compact('sections', 'invoice'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
+
     public function update(Request $request, $id)
     {
 
@@ -192,9 +184,7 @@ class InvoiceController extends Controller
 
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
+
     public function destroy($id)
     {
         try {
@@ -303,6 +293,11 @@ class InvoiceController extends Controller
         $invoice = Invoice::where('id', $id)->first();
         return view('invoices.print_invoice', compact('invoice'));
 
+    }
+
+    public function export()
+    {
+        return Excel::download(new InvoicesExport, 'invoices.xlsx');
     }
 
     public function error($message = null): RedirectResponse
