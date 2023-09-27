@@ -10,6 +10,12 @@ use Illuminate\Http\Request;
 class ArchiveInvoiceController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('permission:' . ARCHIVED_INVOICES_PERMISSION)->only('create', 'store');
+        $this->middleware('permission:' . DELETE_USER_PERMISSION)->only('destroy');
+    }
+
     public function index()
     {
         $invoices = Invoice::onlyTrashed()->get();

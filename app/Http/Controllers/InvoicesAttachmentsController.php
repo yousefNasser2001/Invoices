@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Validator;
 class InvoicesAttachmentsController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('permission:' . CREATE_ATTACHEMENT_PERMISSION)->only('store');
+    }
+
     public function index()
     {
         return back();

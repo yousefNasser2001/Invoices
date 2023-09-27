@@ -35,10 +35,12 @@
         <div class="col-xl-12">
             <div class="card mg-b-20">
                 <div class="card-header pb-0">
-                    <div class="d-flex justify-content-between">
-                        <a class="modal-effect btn btn-outline-primary btn-block" data-effect="effect-scale"
-                            data-toggle="modal" href="#exampleModal">اضافة منتج</a>
-                    </div>
+                    @can(CREATE_PRODUCT_PERMISSION)
+                        <div class="d-flex justify-content-between">
+                            <a class="modal-effect btn btn-outline-primary btn-block" data-effect="effect-scale"
+                                data-toggle="modal" href="#exampleModal">اضافة منتج</a>
+                        </div>
+                    @endcan
 
                 </div>
                 <div class="card-body">
@@ -64,16 +66,21 @@
                                         <td>{{ $product->sections->section_name }}</td>
                                         <td>{{ $product->description }}</td>
                                         <td>
-                                            <button class="btn btn-outline-success btn-sm"
-                                                data-name="{{ $product->product_name }}" data-pro_id="{{ $product->id }}"
-                                                data-section_name="{{ $product->sections->section_name }}"
-                                                data-description="{{ $product->description }}" data-toggle="modal"
-                                                data-target="#edit_Product">تعديل</button>
+                                            @can(EDIT_PRODUCT_PERMISSION)
+                                                <button class="btn btn-outline-success btn-sm"
+                                                    data-name="{{ $product->product_name }}" data-pro_id="{{ $product->id }}"
+                                                    data-section_name="{{ $product->sections->section_name }}"
+                                                    data-description="{{ $product->description }}" data-toggle="modal"
+                                                    data-target="#edit_Product">تعديل</button>
+                                            @endcan
 
-                                            <button class="btn btn-outline-danger btn-sm "
-                                                data-pro_id="{{ $product->id }}"
-                                                data-product_name="{{ $product->product_name }}" data-toggle="modal"
-                                                data-target="#modaldemo9">حذف</button>
+
+                                            @can(DELETE_PRODUCT_PERMISSION)
+                                                <button class="btn btn-outline-danger btn-sm "
+                                                    data-pro_id="{{ $product->id }}"
+                                                    data-product_name="{{ $product->product_name }}" data-toggle="modal"
+                                                    data-target="#modaldemo9">حذف</button>
+                                            @endcan
                                         </td>
                                     </tr>
                                 @endforeach
@@ -146,7 +153,7 @@
                             <div class="form-group">
 
                                 <input type="hidden" class="form-control" name="pro_id" id="pro_id"
-                                value="">
+                                    value="">
 
                                 <label for="title">اسم المنتج :</label>
                                 <input type="text" class="form-control" name="product_name" id="product_name">

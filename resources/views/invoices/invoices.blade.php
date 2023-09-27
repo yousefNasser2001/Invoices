@@ -36,12 +36,16 @@
         <div class="col-xl-12">
             <div class="card mg-b-20">
                 <div class="card-header pb-0">
-                    <a href="{{ route('invoices.create') }}" class="modal-effect btn btn-sm btn-primary"
-                        style="color:white"><i class="fas fa-plus"></i>&nbsp; اضافة فاتورة</a>
+                    @can(CREATE_INVOICE_PERMISSION)
+                        <a href="{{ route('invoices.create') }}" class="modal-effect btn btn-sm btn-primary"
+                            style="color:white"><i class="fas fa-plus"></i>&nbsp; اضافة فاتورة</a>
+                    @endcan
 
 
-                    <a class="modal-effect btn btn-sm btn-primary" href="{{route('export_invoice')}}"
-                        style="color:white"><i class="fas fa-file-download"></i>&nbsp;تصدير اكسيل</a>
+                    @can(EXCEL_PERMISSION)
+                        <a class="modal-effect btn btn-sm btn-primary" href="{{ route('export_invoice') }}"
+                            style="color:white"><i class="fas fa-file-download"></i>&nbsp;تصدير اكسيل</a>
+                    @endcan
 
 
                 </div>
@@ -102,39 +106,47 @@
                                                     class="btn ripple btn-primary btn-sm" data-toggle="dropdown"
                                                     type="button">العمليات<i class="fas fa-caret-down ml-1"></i></button>
                                                 <div class="dropdown-menu tx-13">
-                                                    <a class="dropdown-item"
-                                                        href=" {{ route('invoices.edit', $invoice->id) }}">تعديل
-                                                        الفاتورة</a>
-
-
-
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('status.show', $invoice->id) }}"><i
-                                                            class=" text-success fas fa-money-bill"></i>&nbsp;&nbsp;تغيير
-                                                        حالة الدفع
-                                                    </a>
-
-
-                                                    <form action="{{ route('invoices.destroy', $invoice->id) }}"
-                                                        method="post" data-kt-debts-table-filter="delete_form">
-                                                        <a class="dropdown-item" href=""
-                                                            data-kt-debts-table-filter="delete_row"><i
-                                                                class=" text-danger fas fa-trash-alt"></i>&nbsp;&nbsp;حذف
+                                                    @can(EDIT_INVOICE_PERMISSION)
+                                                        <a class="dropdown-item"
+                                                            href=" {{ route('invoices.edit', $invoice->id) }}">تعديل
                                                             الفاتورة</a>
-                                                    </form>
-
-                                                    <a class="dropdown-item" href="#"
-                                                        data-invoice_id="{{ $invoice->id }}" data-toggle="modal"
-                                                        data-target="#Transfer_invoice"><i
-                                                            class="text-warning fas fa-exchange-alt"></i>&nbsp;&nbsp;نقل الي
-                                                        الارشيف</a>
+                                                    @endcan
 
 
-                                                    <a class="dropdown-item"
-                                                        href="{{ route('print_invoice', $invoice->id) }}"><i
-                                                            class="text-success fas fa-print"></i>&nbsp;&nbsp;طباعة
-                                                        الفاتورة
-                                                    </a>
+                                                    @can(CHANGE_STATUS_PERMISSION)
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('status.show', $invoice->id) }}"><i
+                                                                class=" text-success fas fa-money-bill"></i>&nbsp;&nbsp;تغيير
+                                                            حالة الدفع
+                                                        </a>
+                                                    @endcan
+
+
+                                                    @can(DELETE_INVOICE_PERMISSION)
+                                                        <form action="{{ route('invoices.destroy', $invoice->id) }}"
+                                                            method="post" data-kt-debts-table-filter="delete_form">
+                                                            <a class="dropdown-item" href=""
+                                                                data-kt-debts-table-filter="delete_row"><i
+                                                                    class=" text-danger fas fa-trash-alt"></i>&nbsp;&nbsp;حذف
+                                                                الفاتورة</a>
+                                                        </form>
+                                                    @endcan
+
+                                                    @can(ARCHIVE_INVOICE_PERMISSION)
+                                                        <a class="dropdown-item" href="#"
+                                                            data-invoice_id="{{ $invoice->id }}" data-toggle="modal"
+                                                            data-target="#Transfer_invoice"><i
+                                                                class="text-warning fas fa-exchange-alt"></i>&nbsp;&nbsp;نقل الي
+                                                            الارشيف</a>
+                                                    @endcan
+
+                                                    @can(PRINT_INVOICE_PERMISSION)
+                                                        <a class="dropdown-item"
+                                                            href="{{ route('print_invoice', $invoice->id) }}"><i
+                                                                class="text-success fas fa-print"></i>&nbsp;&nbsp;طباعة
+                                                            الفاتورة
+                                                        </a>
+                                                    @endcan
 
 
                                                 </div>

@@ -22,6 +22,21 @@ use Maatwebsite\Excel\Facades\Excel;
 class InvoiceController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('permission:' . INVOICES_LIST_PERMISSION)->only('index');
+        $this->middleware('permission:' . PAID_INVOICES_PERMISSION)->only('paid_invoices');
+        $this->middleware('permission:' . PARTIAL_PAID_INVOICES_PERMISSION)->only('partial_paid_invoices');
+        $this->middleware('permission:' . UNPAID_INVOICES_PERMISSION)->only('unpaid_invoices');
+        $this->middleware('permission:' . ARCHIVE_INVOICE_PERMISSION)->only('archive_invoice');
+        $this->middleware('permission:' . PRINT_INVOICE_PERMISSION)->only('print_invoice');
+        $this->middleware('permission:' . EXCEL_PERMISSION)->only('export');
+        $this->middleware('permission:' . CHANGE_STATUS_PERMISSION)->only('update_status');
+        $this->middleware('permission:' . CREATE_INVOICE_PERMISSION)->only('create', 'store');
+        $this->middleware('permission:' . EDIT_INVOICE_PERMISSION)->only('edit', 'update');
+        $this->middleware('permission:' . DELETE_INVOICE_PERMISSION)->only('destroy');
+    }
+
     public function index()
     {
         $invoices = Invoice::orderByDesc('id')->get();

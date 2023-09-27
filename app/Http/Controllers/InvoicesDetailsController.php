@@ -12,6 +12,11 @@ use Illuminate\Support\Facades\Storage;
 class InvoicesDetailsController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('permission:' . DELETE_ATTACHEMENT_PERMISSION)->only('destroy');
+    }
+
     public function index()
     {
         return back();

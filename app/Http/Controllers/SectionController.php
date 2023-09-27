@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Validator;
 class SectionController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('permission:' . SECTIONS_PERMISSION)->only('index');
+        $this->middleware('permission:' . CREATE_SECTION_PERMISSION)->only('create', 'store');
+        $this->middleware('permission:' . EDIT_SECTION_PERMISSION)->only('edit', 'update');
+        $this->middleware('permission:' . DELETE_SECTION_PERMISSION)->only('destroy');
+    }
+
     public function index()
     {
         $sections = Section::orderByDesc('id')->get();
