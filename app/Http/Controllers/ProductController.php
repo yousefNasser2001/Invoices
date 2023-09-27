@@ -12,6 +12,14 @@ use Illuminate\Support\Facades\Validator;
 class ProductController extends Controller
 {
 
+    public function __construct()
+    {
+        $this->middleware('permission:' . PRODUCTS_PERMISSION)->only('index');
+        $this->middleware('permission:' . CREATE_PRODUCT_PERMISSION)->only('create', 'store');
+        $this->middleware('permission:' . EDIT_PRODUCT_PERMISSION)->only('edit', 'update');
+        $this->middleware('permission:' . DELETE_PRODUCT_PERMISSION)->only('destroy');
+    }
+
     public function index()
     {
         $products = Product::orderByDesc('id')->get();
