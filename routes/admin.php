@@ -6,7 +6,9 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoicesAttachmentsController;
 use App\Http\Controllers\InvoicesDetailsController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SectionController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,7 +23,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::prefix('dashboard/admin/')->group(static function () {
-    Route::middleware(['auth', 'verified'])->group(static function () {
+    Route::middleware(['auth', 'verified' ,'check.status'])->group(static function () {
         Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
         Route::resource('invoices', InvoiceController::class);
@@ -48,6 +50,10 @@ Route::prefix('dashboard/admin/')->group(static function () {
         Route::get('print_invoice/{id}', [InvoiceController::class, 'print_invoice'])->name('print_invoice');
 
         Route::get('invoices_export', [InvoiceController::class, 'export'])->name('export_invoice');
+
+        Route::resource('users' , UserController::class);
+        Route::resource('roles' , RoleController::class);
+
 
 
     });
