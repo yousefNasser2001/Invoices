@@ -23,7 +23,7 @@ class PermissionSeeder extends Seeder
             ARCHIVED_INVOICES_PERMISSION,
             REPORTS_PERMISSION,
             INVOICES_REPORT_PERMISSION,
-            EMPLOYEES_LIST_PERMISSION,
+            EMPLOYEES_REPORT_PERMISSION,
             USERS_PERMISSION,
             USERS_LIST_PERMISSION,
             USERS_ROLES_PERMISSION,
