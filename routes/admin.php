@@ -62,6 +62,7 @@ Route::prefix('dashboard/admin/')->group(static function () {
         Route::get('customers_report' , [CustomersReport::class , 'index'])->name('customers_report');
         Route::post('customer_search_report' , [CustomersReport::class , 'search_customers'])->name('customers_report_search');
 
+        Route::get('MarkAsRead_all',[InvoiceController::class , 'markAsRead_all'])->name('MarkAsRead_all');
 
     });
 });
