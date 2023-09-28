@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArchiveInvoiceController;
+use App\Http\Controllers\CustomersReport;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoicesAttachmentsController;
 use App\Http\Controllers\InvoicesDetailsController;
+use App\Http\Controllers\InvoicesReport;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SectionController;
@@ -54,6 +56,11 @@ Route::prefix('dashboard/admin/')->group(static function () {
         Route::resource('users' , UserController::class);
         Route::resource('roles' , RoleController::class);
 
+        Route::get('invoices_report' , [InvoicesReport::class , 'index'])->name('invoices_report');
+        Route::post('invoice_search_report' , [InvoicesReport::class , 'search_invoices'])->name('invoices_report_search');
+
+        Route::get('customers_report' , [CustomersReport::class , 'index'])->name('customers_report');
+        Route::post('customer_search_report' , [CustomersReport::class , 'search_customers'])->name('customers_report_search');
 
 
     });

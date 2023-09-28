@@ -82,11 +82,11 @@
                         </svg><span class="side-menu__label">التقارير</span><i class="angle fe fe-chevron-down"></i></a>
                     <ul class="slide-menu">
                         @can(INVOICES_REPORT_PERMISSION)
-                            <li><a class="slide-item" href="{{ url('/' . ($page = 'cards')) }}">تقارير الفواتير</a></li>
+                            <li><a class="slide-item" href="{{ route('invoices_report') }}">تقارير الفواتير</a></li>
                         @endcan
 
-                        @can(EMPLOYEES_LIST_PERMISSION)
-                            <li><a class="slide-item" href="{{ url('/' . ($page = 'darggablecards')) }}">تقارير العملاء</a>
+                        @can(EMPLOYEES_REPORT_PERMISSION)
+                            <li><a class="slide-item" href="{{ route('customers_report') }}">تقارير العملاء</a>
                             </li>
                         @endcan
                     </ul>
