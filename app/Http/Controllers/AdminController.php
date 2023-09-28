@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Invoice;
 use Illuminate\Http\Request;
 
 class AdminController extends Controller
@@ -13,72 +14,70 @@ class AdminController extends Controller
      */
     public function index()
     {
-        return view('index');
-    }
+        //=================احصائية نسبة تنفيذ الحالات======================
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+        $count_all = Invoice::count();
+        $count_invoices1 = Invoice::where('value_status', 1)->count(); // الفواتير المدفوعة
+        $count_invoices2 = Invoice::where('value_status', 0)->count(); // الفواتير الغير مدفوعة
+        $count_invoices3 = Invoice::where('value_status', 2)->count(); // الفواتير المدغوعة جزئيا
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
-    }
+        if ($count_invoices2 == 0) {
+            $nspainvoices2 = 0;
+        } else {
+            $nspainvoices2 = $count_invoices2 / $count_all * 100;
+        }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
+        if ($count_invoices1 == 0) {
+            $nspainvoices1 = 0;
+        } else {
+            $nspainvoices1 = $count_invoices1 / $count_all * 100;
+        }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+        if ($count_invoices3 == 0) {
+            $nspainvoices3 = 0;
+        } else {
+            $nspainvoices3 = $count_invoices3 / $count_all * 100;
+        }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
+        $chartjs = app()->chartjs
+            ->name('barChartTest')
+            ->type('bar')
+            ->size(['width' => 350, 'height' => 200])
+            ->labels(['الفواتير الغير المدفوعة', 'الفواتير المدفوعة', 'الفواتير المدفوعة جزئيا'])
+            ->datasets([
+                [
+                    "label" => "الفواتير الغير المدفوعة",
+                    'backgroundColor' => ['#ec5858'],
+                    'data' => [$nspainvoices2],
+                ],
+                [
+                    "label" => "الفواتير المدفوعة",
+                    'backgroundColor' => ['#81b214'],
+                    'data' => [$nspainvoices1],
+                ],
+                [
+                    "label" => "الفواتير المدفوعة جزئيا",
+                    'backgroundColor' => ['#ff9642'],
+                    'data' => [$nspainvoices3],
+                ],
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+            ])
+            ->options([]);
+
+        $chartjs_2 = app()->chartjs
+            ->name('pieChartTest')
+            ->type('pie')
+            ->size(['width' => 340, 'height' => 200])
+            ->labels(['الفواتير الغير المدفوعة', 'الفواتير المدفوعة', 'الفواتير المدفوعة جزئيا'])
+            ->datasets([
+                [
+                    'backgroundColor' => ['#ec5858', '#81b214', '#ff9642'],
+                    'data' => [$nspainvoices2, $nspainvoices1, $nspainvoices3],
+                ],
+            ])
+            ->options([]);
+
+        return view('index', compact('chartjs', 'chartjs_2'));
+
     }
 }
