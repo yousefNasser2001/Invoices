@@ -8,7 +8,7 @@ use App\Models\InvoicesAttachments;
 use App\Models\InvoicesDetails;
 use App\Models\Section;
 use App\Models\User;
-use App\Notifications\AddInvoice;
+use App\Notifications\AddNewInvoice;
 use Exception;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -43,13 +43,11 @@ class InvoiceController extends Controller
         return view('invoices.invoices', compact('invoices'));
     }
 
-
     public function create()
     {
         $sections = Section::pluck('id', 'section_name');
         return view('invoices.add_invoices', compact('sections'));
     }
-
 
     public function store(Request $request)
     {
@@ -75,7 +73,7 @@ class InvoiceController extends Controller
         DB::beginTransaction();
 
         try {
-            Invoice::create([
+            $invoice = Invoice::create([
                 'invoice_number' => $request->invoice_number,
                 'invoice_date' => $request->invoice_date,
                 'due_date' => $request->due_date,
@@ -90,7 +88,6 @@ class InvoiceController extends Controller
                 'status' => 'غير مدفوعة',
                 'value_status' => 0,
                 'note' => $request->note,
-
             ]);
 
             $invoice_id = Invoice::latest()->first()->id;
@@ -124,8 +121,11 @@ class InvoiceController extends Controller
                 $request->pic->move(public_path('Attachments/' . $invoice_number), $imageName);
             }
 
-            $user = User::first();
-            Notification::send($user, new AddInvoice($invoice_id));
+            // $user = User::first();
+            // Notification::send($user, new AddInvoice($invoice_id));
+
+            $users = User::where('id', '!=', auth()->user()->id)->get();
+            Notification::send($users, new AddNewInvoice($invoice));
 
             flash('تم اضافة الفاتورة بنجاح')->success();
             DB::commit();
@@ -143,14 +143,12 @@ class InvoiceController extends Controller
         return view('invoices.update_status', compact('invoice'));
     }
 
-
     public function edit($id)
     {
         $invoice = Invoice::where('id', $id)->first();
         $sections = Section::pluck('id', 'section_name');
         return view('invoices.edit_invoice', compact('sections', 'invoice'));
     }
-
 
     public function update(Request $request, $id)
     {
@@ -198,7 +196,6 @@ class InvoiceController extends Controller
         }
 
     }
-
 
     public function destroy($id)
     {
@@ -313,6 +310,18 @@ class InvoiceController extends Controller
     public function export()
     {
         return Excel::download(new InvoicesExport, 'invoices.xlsx');
+    }
+
+    public function MarkAsRead_all(Request $request)
+    {
+
+        $userUnreadNotification = auth()->user()->unreadNotifications;
+
+        if ($userUnreadNotification) {
+            $userUnreadNotification->markAsRead();
+            return back();
+        }
+
     }
 
     public function error($message = null): RedirectResponse
