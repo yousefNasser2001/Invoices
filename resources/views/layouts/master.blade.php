@@ -40,3 +40,12 @@
 </body>
 
 </html>
+
+{{-- طريقة لعرض الاشعارات اشبه بطرق الريل تايم ولكنها بتعمل لود كبير عالسيرفر فهي غير مجدية  --}}
+
+{{-- <script>
+    setInterval(function() {
+        $("#notifications_count").load(window.location.href + " #notifications_count");
+        $("#unreadNotifications").load(window.location.href + " #unreadNotifications");
+    }, 5000);
+</script> --}}

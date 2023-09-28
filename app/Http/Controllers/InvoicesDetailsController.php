@@ -17,28 +17,42 @@ class InvoicesDetailsController extends Controller
         $this->middleware('permission:' . DELETE_ATTACHEMENT_PERMISSION)->only('destroy');
     }
 
-    public function index()
-    {
-        return back();
-    }
-
-    public function create()
-    {
-        return back();
-    }
-
-    public function store(Request $request)
-    {
-        return back();
-    }
-
-    public function show(InvoicesDetails $invoicesDetails)
-    {
-        return back();
-    }
-
     public function edit($id)
     {
+
+        // الطريقة الاولى
+
+        // if ((request()->input('notification_id'))) {
+        //     $user = auth()->user();
+        //     $notificationId = request()->input('notification_id');
+
+        //     $notification = DB::table('notifications')
+        //         ->where('notifiable_id', $user->id)
+        //         ->where('id', $notificationId)
+        //         ->first();
+
+        //     if ($notification) {
+        //         $readAt = Carbon::now();
+
+        //         DB::table('notifications')
+        //             ->where('id', $notificationId)
+        //             ->update(['read_at' => $readAt]);
+        //     }
+        // }
+
+        // الطريقةالثانية
+
+        $notificationId = request()->input('notification_id');
+
+        if ($notificationId) {
+            $user = auth()->user();
+            $notification = $user->unreadNotifications->find($notificationId);
+
+            if ($notification) {
+                $notification->markAsRead();
+            }
+        }
+
         $invoices = Invoice::where('id', $id)->first();
         $details = InvoicesDetails::where('invoice_id', $id)->get();
         $attachments = InvoicesAttachments::where('invoice_id', $id)->get();
@@ -47,10 +61,6 @@ class InvoicesDetailsController extends Controller
 
     }
 
-    public function update(Request $request, InvoicesDetails $invoicesDetails)
-    {
-        return back();
-    }
 
     public function destroy(Request $request)
     {
