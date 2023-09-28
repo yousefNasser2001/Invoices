@@ -79,19 +79,27 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
-            'roles' => 'required',
+            'roles_name' => 'required',
         ]);
+
         $input = $request->all();
+
         try {
+
             if (!empty($input['password'])) {
                 $input['password'] = Hash::make($input['password']);
             } else {
-                $input = array_except($input, array('password'));
+                unset($input['password']);
             }
+
             $user = User::find($id);
             $user->update($input);
+
             DB::table('model_has_roles')->where('model_id', $id)->delete();
-            $user->assignRole($request->input('roles'));
+            $user->assignRole($request->input('roles_name'));
+
+            // $user->syncRoles([$request->input('roles')]);
+
             flash('تم تحديث بيانات المستخدم بنجاح')->success();
             return redirect()->route('users.index');
         } catch (Exception $e) {
