@@ -4,6 +4,7 @@ namespace App\Notifications;
 
 use App\Models\Invoice;
 use Illuminate\Bus\Queueable;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Notification;
 use Illuminate\Support\Facades\Auth;
 
@@ -19,17 +20,28 @@ class AddNewInvoice extends Notification
 
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     public function toDatabase(object $notifiable): array
     {
         return [
-            //'data' => $this->details['body']
             'id' => $this->invoice->id,
             'title' => 'تم اضافة فاتورة جديد بواسطة :',
             'user' => Auth::user()->name,
 
         ];
+    }
+
+    public function toBroadcast(Object $notifiable)
+    {
+        return new BroadcastMessage(
+            [
+                'invoice_id' => $this->invoice->id,
+                'title' => 'تم اضافة فاتورة جديد بواسطة :',
+                'user' => Auth::user()->name,
+
+            ]
+        );
     }
 }
