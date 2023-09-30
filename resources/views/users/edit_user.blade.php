@@ -88,6 +88,22 @@
                 </div>
 
                 <div class="row mg-b-20">
+                    <div class="parsley-input col-md-6">
+                        <label>بداية ساعات العمل:</label>
+                        <input class="form-control form-control-sm mg-b-20" name="working_hours_start"
+                        value="{{$user->working_hours_start}}"
+                            type="time">
+                    </div>
+                    <div class="parsley-input col-md-6 mg-t-20 mg-md-t-0">
+                        <label>نهاية ساعات العمل:</label>
+                        <input class="form-control form-control-sm mg-b-20" name="working_hours_end"
+                        value="{{$user->working_hours_end}}"
+                        type="time">
+                    </div>
+                </div>
+
+
+                <div class="row mg-b-20">
                     <div class="col-xs-12 col-sm-12 col-md-12">
                         <div class="form-group">
                             <strong>نوع المستخدم</strong>

@@ -43,6 +43,9 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email',
             'password' => 'required|same:confirm-password',
             'roles_name' => 'required',
+            'working_hours_start' => 'nullable|date_format:H:i',
+            'working_hours_end' => 'nullable|date_format:H:i|after:working_hours_start',
+
         ]);
 
         $input = $request->all();
@@ -80,6 +83,8 @@ class UserController extends Controller
             'email' => 'required|email|unique:users,email,' . $id,
             'password' => 'same:confirm-password',
             'roles_name' => 'required',
+            'working_hours_start' => 'nullable|date_format:H:i',
+            'working_hours_end' => 'nullable|date_format:H:i|after:working_hours_start',
         ]);
 
         $input = $request->all();
