@@ -45,7 +45,7 @@
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
-                        <table id="example1" class="table key-buttons text-md-nowrap" data-page-length='50'>
+                        <table id="invoices-table" class="table key-buttons text-md-nowrap" data-page-length='50'>
                             <thead>
                                 <tr>
                                     <th class="border-bottom-0">#</th>
@@ -251,5 +251,90 @@
         })
     </script>
 
+    <script>
+        toastr.options = {
+            positionClass: 'toast-bottom-left', // Set the position to left-bottom
+        };
+        let table = document.getElementById('invoices-table');
+        // Select all delete buttons
 
+        dataTable = $(table).DataTable({
+            language: {
+                searchPlaceholder: 'Search...',
+                sSearch: '',
+                lengthMenu: '_MENU_',
+            }
+        });
+        const deleteButtons = table.querySelectorAll('[data-kt-debts-table-filter="delete_row"]');
+
+        deleteButtons.forEach(d => {
+            // Delete button on click
+            d.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Select parent row
+                const parent = e.target.closest('tr');
+                const invoiceName = parent.querySelectorAll('td')[1].innerText;
+                // Select all delete form
+                const deletForm = parent.querySelector(
+                    '[data-kt-debts-table-filter="delete_form"]');
+
+                Swal.fire({
+                    text: "هل أنت متأكد من أنك تريد حذف  " + invoiceName + "؟",
+                    icon: "warning",
+                    showCancelButton: true,
+                    buttonsStyling: false,
+                    confirmButtonText: "نعم ، احذف!",
+                    cancelButtonText: "لا ، ارجع",
+                    customClass: {
+                        confirmButton: "btn fw-bold btn-danger",
+                        cancelButton: "btn fw-bold btn-active-light-primary"
+                    }
+                }).then(function(result) {
+                    if (result.value) {
+                        // Remove current row
+                        let Url = deletForm.action;
+                        let method = deletForm.method;
+                        let csrfToken = $('meta[name="csrf-token"]').attr('content');
+                        $.ajax({
+                            url: Url,
+                            type: method,
+                            headers: {
+                                'X-CSRF-TOKEN': csrfToken,
+                            },
+                            data: {
+                                '_method': 'delete'
+                            },
+                            success: function(response) {
+                                if (response.status == 'success') {
+                                    toastr.success(response.message);
+                                    dataTable.row($(parent)).remove().draw();
+                                } else if (response.status == 'warning') {
+                                    toastr.warning(response.message);
+                                } else if (response.status == 'error') {
+                                    toastr.error(response.message);
+                                }
+                                console.log(response.message)
+                            },
+                            error: function(xhr, status, error) {
+                                console.log(error);
+                            }
+                        }).then(function() {
+                            // Detect checked checkboxes
+                            toggleToolbars();
+                        });
+                    } else if (result.dismiss === 'cancel') {
+                        Swal.fire({
+                            text: invoiceName + " لم يتم حذفها .",
+                            icon: "error",
+                            buttonsStyling: false,
+                            confirmButtonText: "حسنا ، اذهب!",
+                            customClass: {
+                                confirmButton: "btn fw-bold btn-primary",
+                            }
+                        });
+                    }
+                });
+            })
+        });
+    </script>
 @endsection
