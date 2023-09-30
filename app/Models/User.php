@@ -28,6 +28,8 @@ class User extends Authenticatable
         'provider',
         'provider_id',
         'provider_token',
+        'working_hours_start',
+        'working_hours_end',
     ];
 
 
