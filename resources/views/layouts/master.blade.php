@@ -41,6 +41,13 @@
 
 </html>
 
+
+<script>
+    const userID = "{{Auth::id()}}";
+</script>
+
+@vite('resources/js/app.js')
+
 {{-- طريقة لعرض الاشعارات اشبه بطرق الريل تايم ولكنها بتعمل لود كبير عالسيرفر فهي غير مجدية  --}}
 
 {{-- <script>
