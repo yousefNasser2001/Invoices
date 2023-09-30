@@ -25,7 +25,7 @@ use Illuminate\Support\Facades\Route;
  */
 
 Route::prefix('dashboard/admin/')->group(static function () {
-    Route::middleware(['auth', 'verified' ,'check.status'])->group(static function () {
+    Route::middleware(['auth', 'verified' ,'check.status', 'checkUserWorkHours'])->group(static function () {
         Route::get('/', [AdminController::class, 'index'])->name('dashboard');
 
         Route::resource('invoices', InvoiceController::class);
