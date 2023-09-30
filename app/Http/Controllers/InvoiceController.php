@@ -173,7 +173,7 @@ class InvoiceController extends Controller
         }
 
         try {
-            $invoice = Invoice::findOrFail($id);
+            $invoice = Invoice::find($id);
             $invoice->update([
                 'invoice_number' => $request->invoice_number,
                 'invoice_date' => $request->invoice_date,
@@ -200,8 +200,8 @@ class InvoiceController extends Controller
     public function destroy($id)
     {
         try {
-            $invoice = Invoice::findOrFail($id);
-            $Details = InvoicesAttachments::findOrFail($id);
+            $invoice = Invoice::find($id);
+            $Details = InvoicesAttachments::find($id);
 
             if (!empty($Details->invoice_number)) {
                 Storage::disk('public_uploads')->deleteDirectory($Details->invoice_number);
@@ -217,7 +217,7 @@ class InvoiceController extends Controller
         } catch (Exception) {
             return response()->json([
                 'status' => 'error',
-                'message' => translate('messages.Wrong'),
+                'message' => 'dawdawd',
             ]);
         }
     }
@@ -225,7 +225,7 @@ class InvoiceController extends Controller
     public function archive_invoice(Request $request)
     {
         $id = $request->invoice_id;
-        $invoices = Invoice::findOrFail($id);
+        $invoices = Invoice::find($id);
         $invoices->delete();
         flash('تم ارشفة الفاتورة بنجاح')->success();
         return redirect()->route('archive.index');
@@ -239,7 +239,7 @@ class InvoiceController extends Controller
 
     public function update_status($id, Request $request)
     {
-        $invoices = Invoice::findOrFail($id);
+        $invoices = Invoice::find($id);
 
         if ($request->status === 'مدفوعة') {
 
