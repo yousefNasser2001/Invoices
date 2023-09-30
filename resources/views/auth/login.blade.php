@@ -11,6 +11,108 @@
         rel="stylesheet">
 @endsection
 @section('content')
+    <style>
+        body {
+            font-size: 16px;
+        }
+
+        /* Style for headings */
+        h2 {
+            font-size: 1.5rem;
+            margin-right: 10%;
+        }
+
+        h5 {
+            font-size: 1.2rem;
+            margin-right: 15%;
+        }
+
+        /* Font for buttons */
+        .btn-social {
+            font-weight: bold;
+            /* Other styles remain the same */
+        }
+
+        /* Font for labels and form fields */
+        label {
+            font-weight: bold;
+        }
+
+        /* Style for the parent container */
+        .row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        /* Style for individual social login buttons */
+        .btn-social {
+            display: block;
+            padding: 10px 20px;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .google-btn {
+            background-color: #db4a39 !important;
+            /* Google's red */
+        }
+
+        .facebook-btn {
+            background-color: #1877f2 !important;
+            /* Facebook's blue */
+        }
+
+        .twitter-btn {
+            background-color: #1da1f2 !important;
+            /* Twitter's blue */
+        }
+
+        /* Style for the "Or" separator */
+        .alt-option {
+            text-align: center;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        .alt-option span {
+            font-weight: bold;
+            color: #333;
+            background-color: #fff;
+            padding: 0 10px;
+        }
+
+        /* Add lines above and below the "Or" string */
+        .alt-option::before,
+        .alt-option::after {
+            content: "";
+            position: absolute;
+            top: 50%;
+            width: 40%;
+            height: 1px;
+            background-color: #333;
+        }
+
+        .alt-option::before {
+            left: 0;
+        }
+
+        .alt-option::after {
+            right: 0;
+        }
+
+        /* Adjust the position of the lines */
+        .alt-option span {
+            position: relative;
+            z-index: 1;
+            background-color: #fff;
+            padding: 0 10px;
+        }
+    </style>
     <div class="container-fluid">
         <div class="row no-gutter">
             <!-- The image half -->
@@ -26,8 +128,38 @@
                                 <div class="card-sigin">
                                     <div class="card-sigin">
                                         <div class="main-signup-header">
-                                            <h2>مرحبا بك</h2>
-                                            <h5 class="font-weight-semibold mb-4"> تسجيل الدخول</h5>
+                                            <h2 style="margin-right:40%">مرحبا بك</h2>
+                                            <h5 class="font-weight-semibold mb-4" style="margin-right:15%"> بامكانك تسجيل
+                                                الدخول من خلال حساباتك التالية</h5>
+
+                                            <div class="row">
+                                                <div class="col-lg-4 col-md-4 col-12">
+                                                    <a class="btn btn-social google-btn"
+                                                        href="{{ route('auth.socialite.redirect', 'google') }}">
+                                                        <i class="lni lni-google"></i> Google
+                                                    </a>
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-12">
+                                                    <a class="btn btn-social facebook-btn"
+                                                        href="{{ route('auth.socialite.redirect', 'facebook') }}">
+                                                        <i class="lni lni-facebook"></i> Facebook
+                                                    </a>
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-12">
+                                                    <a class="btn btn-social twitter-btn"
+                                                        href="">
+                                                        <i class="lni lni-twitter"></i> Twitter
+                                                    </a>
+                                                </div>
+                                            </div>
+
+                                            <div class="alt-option">
+                                                <span>أو</span>
+                                            </div>
+
+
                                             <form method="POST" action="{{ route('login') }}">
                                                 @csrf
                                                 <div class="form-group">
