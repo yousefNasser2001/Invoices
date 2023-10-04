@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Activitylog\Models\Activity;
 use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
@@ -111,6 +112,22 @@ class UserController extends Controller
             return $this->error();
         }
 
+    }
+
+    public function userActivity()
+    {
+        // Retrieve all users with their activities
+        $usersWithActivities = User::with('activities')->orderByDesc('id')->get();
+
+        // Join the activity_log and users tables to get user names for each activity
+        $activityLogs = Activity::leftJoin('users', function ($join) {
+            $join->on('activity_log.subject_id', '=', 'users.id')
+                ->whereRaw('activity_log.causer_id = users.id');
+        })
+            ->select('activity_log.*', 'users.name as user_name')
+            ->orderByDesc('id')->get();
+
+        return view('users.user-avtivity', compact('usersWithActivities', 'activityLogs'));
     }
 
     public function destroy(Request $request)

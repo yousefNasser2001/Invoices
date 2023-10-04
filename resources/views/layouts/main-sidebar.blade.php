@@ -112,6 +112,11 @@
                             <li><a class="slide-item" href="{{ route('roles.index') }}">صلاحيات المستخدمين</a>
                             </li>
                         @endcan
+
+                        @can(USERS_ROLES_PERMISSION)
+                            <li><a class="slide-item" href="{{ route('user.activity') }}">نشاطات المستخدمين</a>
+                            </li>
+                        @endcan
                     </ul>
                 </li>
             @endcan

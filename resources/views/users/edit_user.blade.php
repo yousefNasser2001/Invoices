@@ -91,13 +91,13 @@
                     <div class="parsley-input col-md-6">
                         <label>بداية ساعات العمل:</label>
                         <input class="form-control form-control-sm mg-b-20" name="working_hours_start"
-                        value="{{$user->working_hours_start}}"
+                        value="{{ date('H:i', strtotime($user->working_hours_start)) }}"
                             type="time">
                     </div>
                     <div class="parsley-input col-md-6 mg-t-20 mg-md-t-0">
                         <label>نهاية ساعات العمل:</label>
                         <input class="form-control form-control-sm mg-b-20" name="working_hours_end"
-                        value="{{$user->working_hours_end}}"
+                        value="{{ date('H:i', strtotime($user->working_hours_end)) }}"
                         type="time">
                     </div>
                 </div>

@@ -19,8 +19,8 @@ return new class extends Migration
             $table->string('password');
             $table->time('working_hours_start')->nullable();
             $table->time('working_hours_end')->nullable();
-            $table->text('roles_name');
-            $table->string('status' , 10);
+            $table->text('roles_name')->nullable();
+            $table->string('status' , 10)->default('مفعل');
             $table->rememberToken();
             $table->timestamps();
         });

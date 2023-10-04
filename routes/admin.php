@@ -64,5 +64,8 @@ Route::prefix('dashboard/admin/')->group(static function () {
 
         Route::get('MarkAsRead_all',[InvoiceController::class , 'markAsRead_all'])->name('MarkAsRead_all');
 
+        Route::get('user-activity', [UserController::class, 'userActivity'])->name('user.activity');
+
+
     });
 });
