@@ -26,7 +26,7 @@ class CheckUserWorkingHours
         }
 
         Auth::logout();
-        flash('You are not allowed to access the control panel at this time.')->error();
+        flash('نعتذر , غير مسموح لك بالوصول الى اللوحة في هذا الوقت')->error();
         return redirect()->route('login');
     }
 
