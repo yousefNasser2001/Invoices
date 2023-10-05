@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ArchiveInvoiceController;
 use App\Http\Controllers\CustomersReport;
+use App\Http\Controllers\FetchApiController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\InvoicesAttachmentsController;
 use App\Http\Controllers\InvoicesDetailsController;
@@ -67,5 +68,6 @@ Route::prefix('dashboard/admin/')->group(static function () {
         Route::get('user-activity', [UserController::class, 'userActivity'])->name('user.activity');
 
 
+        Route::get('fetch' , [FetchApiController::class, 'index'])->name('fetch.api');
     });
 });
